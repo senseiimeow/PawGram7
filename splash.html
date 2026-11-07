@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>PAWGRAM</title>
+<meta name="description" content="PAWGRAM — SEE YOU OFFLINE. Loading into the story.">
+<meta property="og:title" content="PAWGRAM">
+<meta property="og:description" content="PAWGRAM — SEE YOU OFFLINE. Loading into the story.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://senseiimeow.github.io/PawGram7/art/logo-512.png">
+<meta property="og:url" content="https://senseiimeow.github.io/PawGram7/splash.html">
+<meta property="og:image:alt" content="PAWGRAM">
+content="https://senseiimeow.github.io/PawGram7/splash.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="PAWGRAM">
+<meta name="twitter:description" content="PAWGRAM — SEE YOU OFFLINE. Loading into the story.">
+<meta name="twitter:image" content="https://senseiimeow.github.io/PawGram7/art/logo-512.png">
+<meta name="theme-color" content="#07050c">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="art/apple-touch-icon.png">
+<style>body{overflow:hidden}</style>
+</head><body>
+<div id="loader">
+  <div class="lglow"></div>
+  <div class="lstage">
+    <div class="lorbit">
+      <svg class="lring" viewBox="0 0 168 168" aria-hidden="true">
+        <defs><linearGradient id="lgrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#ff6b6b"/><stop offset="0.55" stop-color="#ffb25e"/>
+          <stop offset="1" stop-color="#ffb7c5"/></linearGradient></defs>
+        <circle class="bg" cx="84" cy="84" r="80"/>
+        <circle id="lring" class="fg" cx="84" cy="84" r="80"/>
+      </svg>
+      <span class="lpaw2"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+  <defs><linearGradient id="pg" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#ff6b6b"/><stop offset="1" stop-color="#ffb25e"/></linearGradient></defs>
+  <ellipse cx="12" cy="15.4" rx="5.1" ry="4.1" fill="url(#pg)"/>
+  <ellipse cx="5.6" cy="10.2" rx="2.05" ry="2.6" fill="url(#pg)"/>
+  <ellipse cx="9.7" cy="6.6" rx="2" ry="2.55" fill="url(#pg)"/>
+  <ellipse cx="14.6" cy="6.6" rx="2" ry="2.55" fill="url(#pg)"/>
+  <ellipse cx="18.5" cy="10.2" rx="2.05" ry="2.6" fill="url(#pg)"/>
+</svg></span><span class="lpaw2"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+  <defs><linearGradient id="pg" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#ff6b6b"/><stop offset="1" stop-color="#ffb25e"/></linearGradient></defs>
+  <ellipse cx="12" cy="15.4" rx="5.1" ry="4.1" fill="url(#pg)"/>
+  <ellipse cx="5.6" cy="10.2" rx="2.05" ry="2.6" fill="url(#pg)"/>
+  <ellipse cx="9.7" cy="6.6" rx="2" ry="2.55" fill="url(#pg)"/>
+  <ellipse cx="14.6" cy="6.6" rx="2" ry="2.55" fill="url(#pg)"/>
+  <ellipse cx="18.5" cy="10.2" rx="2.05" ry="2.6" fill="url(#pg)"/>
+</svg></span>
+      <div class="lpaw"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+  <defs><linearGradient id="pg" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#ff6b6b"/><stop offset="1" stop-color="#ffb25e"/></linearGradient></defs>
+  <ellipse cx="12" cy="15.4" rx="5.1" ry="4.1" fill="url(#pg)"/>
+  <ellipse cx="5.6" cy="10.2" rx="2.05" ry="2.6" fill="url(#pg)"/>
+  <ellipse cx="9.7" cy="6.6" rx="2" ry="2.55" fill="url(#pg)"/>
+  <ellipse cx="14.6" cy="6.6" rx="2" ry="2.55" fill="url(#pg)"/>
+  <ellipse cx="18.5" cy="10.2" rx="2.05" ry="2.6" fill="url(#pg)"/>
+</svg></div>
+    </div>
+    <div class="lname"><span style="animation-delay:0.55s">P</span><span style="animation-delay:0.62s">A</span><span style="animation-delay:0.69s">W</span><span style="animation-delay:0.76s">G</span><span style="animation-delay:0.83s">R</span><span style="animation-delay:0.90s">A</span><span style="animation-delay:0.97s">M</span></div>
+    <div class="lsub">See You Offline · Season 1</div>
+    <div class="lbar"><i id="lbar"></i></div>
+    <div class="lpct" id="lpct">0%</div>
+  </div>
+  <div class="ltip">オフラインで会おう · loading the city</div>
+</div>
+<div id="petals"></div>
+<script>
+(function(){
+  var el=document.getElementById('lbar'), pc=document.getElementById('lpct'),
+      ring=document.getElementById('lring'), p=0;
+  /* the splash page's only job is to look good, then hand off */
+  var t=setInterval(function(){
+    p=Math.min(p+Math.random()*11+4,100);
+    el.style.width=p+'%'; pc.textContent=Math.round(p)+'%';
+    ring.style.strokeDashoffset=502-502*p/100;
+    if(p>=100){clearInterval(t);setTimeout(go,260);}
+  },110);
+  function go(){
+    var l=document.getElementById('loader'); l.classList.add('gone');
+    setTimeout(function(){location.replace('index.html');},620);
+  }
+  setTimeout(go,2600);
+  /* petals */
+  var L=document.getElementById('petals');
+  for(var i=0;i<14;i++){var d=document.createElement('i');var s=6+Math.random()*7;
+    d.style.left=(Math.random()*100)+'vw';d.style.width=d.style.height=s+'px';
+    d.style.opacity=(0.15+Math.random()*0.3).toFixed(2);
+    d.style.animationDuration=(12+Math.random()*12)+'s';d.style.animationDelay=(-Math.random()*20)+'s';
+    L.appendChild(d);}
+})();
+</script></body></html>

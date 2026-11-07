@@ -1,0 +1,461 @@
+/* ==========================================================
+   PAWGRAM · Gen-Z Motion Engine v2
+   GSAP + ScrollTrigger · Custom cursor · Loader · Nav
+   ========================================================== */
+(function(){
+  'use strict';
+
+  var doc = document.documentElement;
+  var body = document.body;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var touch = matchMedia('(hover: none)').matches;
+  var small = innerWidth < 760;
+
+  /* ---------- helpers ---------- */
+  function el(s){return document.querySelector(s);}
+  function els(s){return document.querySelectorAll(s);}
+  function clamp(v,min,max){return Math.min(max,Math.max(min,v));}
+
+  /* ---------- reduced motion body class ---------- */
+  if(reduce) body.classList.add('reduced-motion');
+  matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change',function(e){
+    body.classList.toggle('reduced-motion', e.matches);
+  });
+
+  /* ---------- touch device detection ---------- */
+  if(touch) body.classList.add('touch-device');
+
+  /* ---------- GSAP via CDN (async self-loader fallback) ---------- */
+  // GSAP is expected as <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  // plus ScrollTrigger. If missing, we define a tiny stub so the rest of the file won't crash.
+  window._gsapReady = false;
+
+  function loadGSAP(cb){
+    if(window.gsap && window.ScrollTrigger){
+      window._gsapReady = true;
+      cb(); return;
+    }
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js';
+    s.onload = function(){
+      var st = document.createElement('script');
+      st.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js';
+      st.onload = function(){
+        window._gsapReady = true;
+        cb();
+      };
+      doc.head.appendChild(st);
+    };
+    doc.head.appendChild(s);
+  }
+
+  loadGSAP(init);
+
+  /* ---------- init ---------- */
+  function init(){
+    var gsap = window.gsap;
+    var ScrollTrigger = window.ScrollTrigger;
+    if(!gsap) return;
+
+    gsap.registerPlugin(ScrollTrigger);
+
+    /* ---------- cursor ---------- */
+    var cursor = el('#paw-cursor');
+    var trail  = el('.cursor-trail');
+    if(cursor && !touch && !reduce){
+      var tx=0,ty=0,x=0,y=0,scale=1;
+      var state = 'idle';
+      var states = {};
+
+      function setState(s){
+        if(state===s) return;
+        state=s;
+        cursor.className = '';
+        cursor.classList.add('visible');
+        if(s==='read') cursor.classList.add('state-read');
+        if(s==='play') cursor.classList.add('state-play');
+        if(s==='drag') cursor.classList.add('state-drag');
+        if(s==='heart') cursor.classList.add('state-heart');
+      }
+      function clearState(){state='idle';cursor.className='';cursor.classList.remove('visible');}
+
+      document.addEventListener('mousemove',function(e){
+        tx=e.clientX;ty=e.clientY;
+        cursor.classList.add('visible');
+      },{passive:true});
+      document.addEventListener('mouseenter',function(){cursor.classList.add('visible');});
+      document.addEventListener('mouseleave',function(){cursor.classList.remove('visible');});
+
+      // state zones
+      els('a.btn,.btn,button,.gitem,a.motif,.chapter-card').forEach(function(b){
+        b.addEventListener('mouseenter',function(){setState('play');});
+        b.addEventListener('mouseleave',function(){setState('idle');});
+      });
+      els('[data-heart]').forEach(function(b){
+        b.addEventListener('mouseenter',function(){setState('heart');});
+        b.addEventListener('mouseleave',function(){setState('idle');});
+      });
+
+      (function loop(){
+        x += (tx-x)*0.14;
+        y += (ty-y)*0.14;
+        if(cursor.classList.contains('visible')){
+          cursor.style.transform = 'translate('+x.toFixed(1)+'px,'+y.toFixed(1)+'px) translate(-50%,-50%)';
+        }
+        requestAnimationFrame(loop);
+      })();
+    }
+
+    /* ---------- loader ---------- */
+    var loader = el('#loader');
+    if(loader){
+      var lbar = el('#lbar');
+      var lpct = el('#lpct');
+      var lring = el('#lring');
+      var msgs = el('.battery-msg');
+      var p = 0;
+      var msgIdx = 0;
+      var messages = [
+        'threading needle…','0010 0100','loading thread','sakura bloom','neon on',
+        'coral thread →','midnight purple','almost…','99%','ready.'
+      ];
+      var tick = setInterval(function(){
+        p = Math.min(p + (p<70 ? 9 : p<92 ? 4 : 1.4), 96);
+        paint(p);
+        if(msgs && Math.random()>.75){
+          msgs.textContent = messages[msgIdx++ % messages.length];
+        }
+      },90);
+      function paint(v){
+        v=Math.round(v);
+        if(lbar) lbar.style.width = v+'%';
+        if(lpct) lpct.textContent = v+'%';
+        if(lring) lring.style.strokeDashoffset = 502-(502*v/100);
+      }
+      function finish(){
+        if(lbar){lbar.style.width='100%';}
+        if(lpct){lpct.textContent='100%';}
+        if(lring){lring.style.strokeDashoffset=0;}
+        if(msgs){msgs.textContent='connect…';}
+        gsap.to(loader,{opacity:0,visibility:'hidden',duration:.7,ease:varEase('ease'),delay:.4,
+          onComplete:function(){
+            loader.remove();
+            body.style.overflow='';
+          }});
+      }
+      document.body.style.overflow='hidden';
+      if(document.readyState==='complete'){setTimeout(finish,1400);}
+      else{addEventListener('load',function(){setTimeout(finish,1400);});}
+      setTimeout(finish,4600);
+    }
+
+    /* ---------- nav hide/show on scroll ---------- */
+    var nav = el('header.nav');
+    if(nav){
+      var lastY=0,ticking=false;
+      function onScroll(){
+        var y = doc.scrollTop || body.scrollTop;
+        if(y>lastY && y>60){nav.classList.add('hidden');}
+        else if(y<lastY || y<60){nav.classList.remove('hidden');}
+        lastY = y>0?y:0;
+        ticking=false;
+      }
+      addEventListener('scroll',function(){
+        if(!ticking){requestAnimationFrame(onScroll);ticking=true;}
+      },{passive:true});
+    }
+
+    /* ---------- thread SVG draw on scroll ---------- */
+    var thread = el('.thread-svg path');
+    if(thread && ScrollTrigger){
+      var len = thread.getTotalLength();
+      thread.style.strokeDasharray = len;
+      thread.style.strokeDashoffset = len;
+      ScrollTrigger.create({
+        trigger: 'body',
+        start: 'top top',
+        end: 'bottom bottom',
+        scrub: true,
+        onUpdate: function(self){
+          var offset = len * (1 - self.progress);
+          thread.style.strokeDashoffset = offset;
+        }
+      });
+    }
+
+    /* ---------- reveal entries ---------- */
+    if(ScrollTrigger){
+      els('.rv,.reveal').forEach(function(el){
+        gsap.from(el,{
+          scrollTrigger:{trigger:el,start:'top 85%',toggleActions:'play none none reverse'},
+          y:40,opacity:0,duration:.8,ease:'power3.out',
+          clearProps:'all'
+        });
+      });
+    }
+
+    /* ---------- counters ---------- */
+    els('[data-count]').forEach(function(c){
+      var target = parseFloat(c.dataset.count);
+      gsap.to(c,{textContent:target,duration:1.2,ease:'power2.out',scrollTrigger:{
+        trigger:c,start:'top 80%',toggleActions:'play none none none'
+      }});
+    });
+
+    /* ---------- hero entrance ---------- */
+    var hero = el('.hero');
+    if(hero && gsap){
+      var tl = gsap.timeline({defaults:{ease:'power3.out'}});
+
+      // per-letter bounce on title spans
+      els('h1 span').forEach(function(s,i){
+        tl.from(s,{y:40,opacity:0,scale:1.4,duration:.7,ease:'back.out(1.7)'},i*0.08);
+      },0);
+
+      tl.from('.kicker',{y:20,opacity:0,duration:.6},'-=0.5')
+        .from('.badge',{y:20,opacity:0,duration:.6},'-=0.4')
+        .from('.jp',{y:15,opacity:0,duration:.6},'-=0.4')
+        .from('.logline',{y:25,opacity:0,duration:.7},'-=0.3')
+        .from('.hero-cta .btn',{y:20,opacity:0,duration:.6,stagger:.15},'-=0.4')
+        .from('.hero-stats',{y:20,opacity:0,duration:.7},'-=0.5')
+        .from('.phonestage',{y:30,opacity:0,duration:.8,ease:'back.out(1.4)'},'-=0.6')
+        .from('.scrollcue',{y:20,opacity:0,duration:.6},'-=0.4');
+
+      // neon flicker on badge
+      gsap.to('.badge',{
+        duration:0.15,repeat:-1,yoyo:true,ease:'power1.inOut',
+        opacity:function(){return 0.85+Math.random()*0.15;},
+        textShadow:function(){return '0 0 '+(10+Math.random()*10)+'px var(--coral)';}
+      });
+    }
+
+    /* ---------- chat typing in phone ---------- */
+    var chatlog = el('#chatlog');
+    if(chatlog && gsap){
+      var lines = [
+        'u up?',
+        'saw this sakura and thought of you',
+        'it was 2:47 AM',
+        'you replied in 3 seconds',
+        'i saved that message',
+        'now we\u2019re here'
+      ];
+      var li = 0;
+      function typeLine(){
+        if(li>=lines.length) return;
+        var text = lines[li++];
+        var div = document.createElement('div');
+        div.className='bub mine';
+        div.textContent='';
+        chatlog.appendChild(div);
+        var k=0;
+        (function step(){
+          div.textContent = text.slice(0,k+1);
+          k++;
+          if(k<text.length){setTimeout(step,60+Math.random()*40);}
+          else{
+            chatlog.scrollTop = chatlog.scrollHeight;
+            setTimeout(typeLine,700+Math.random()*800);
+          }
+        })();
+      }
+      setTimeout(typeLine,1200);
+    }
+
+    /* ---------- chapters rail: horizontal drag + scroll ---------- */
+    var rail = el('.rail');
+    if(rail){
+      var isDown=false,startX,scrollLeft;
+      rail.addEventListener('mousedown',function(e){isDown=true;startX=e.pageX-rail.offsetLeft;scrollLeft=rail.scrollLeft;rail.classList.add('dragging');},{passive:true});
+      rail.addEventListener('mouseleave',function(){isDown=false;rail.classList.remove('dragging');});
+      rail.addEventListener('mouseup',function(){isDown=false;rail.classList.remove('dragging');});
+      rail.addEventListener('mousemove',function(e){if(!isDown)return;e.preventDefault();var x=e.pageX-rail.offsetLeft;var walk=(x-startX)*1.6;rail.scrollLeft=scrollLeft-walk;},{passive:true});
+      rail.addEventListener('touchstart',function(e){isDown=true;startX=e.touches[0].pageX-rail.offsetLeft;scrollLeft=rail.scrollLeft;},{passive:true});
+      rail.addEventListener('touchend',function(){isDown=false;});
+      rail.addEventListener('touchmove',function(e){if(!isDown)return;var x=e.touches[0].pageX-rail.offsetLeft;var walk=(x-startX)*1.6;rail.scrollLeft=scrollLeft-walk;},{passive:true});
+    }
+
+    /* ---------- season scroll: pin chapters & shift bg ---------- */
+    var chaptersSec = el('#chapters');
+    if(chaptersSec && ScrollTrigger){
+      gsap.to('body',{
+        backgroundColor:'#140d1c',
+        scrollTrigger:{
+          trigger:chaptersSec,start:'top top',end:'+=600',scrub:true,pin:false
+        }
+      });
+      ScrollTrigger.create({
+        trigger:chaptersSec,start:'top top',end:'+=600',scrub:true,
+        onUpdate:function(self){
+          var p = self.progress;
+          var hues = [280,300,320,340,0,20,40];
+          var h = Math.round(hues[Math.floor(p*hues.length)] + (p*hues.length%1)*(hues[Math.min(Math.floor(p*hues.length)+1,hues.length-1)]-hues[Math.floor(p*hues.length)]));
+          doc.style.setProperty('--season-hue',h+'deg');
+        }
+      });
+    }
+
+    /* ---------- thread path: animate draw on scroll ---------- */
+    var threadPath = el('.thread-svg path');
+    if(threadPath && ScrollTrigger){
+      var total = threadPath.getTotalLength();
+      threadPath.style.strokeDasharray = total;
+      threadPath.style.strokeDashoffset = total;
+      ScrollTrigger.create({
+        trigger:'body',start:'top top',end:'bottom bottom',scrub:true,
+        onUpdate:function(self){
+          threadPath.style.strokeDashoffset = total*(1-self.progress);
+        }
+      });
+    }
+
+    /* ---------- cast cards: height bar fill + flip hint ---------- */
+    els('.pcard').forEach(function(card){
+      var fills = card.querySelectorAll('.fill');
+      fills.forEach(function(f){
+        var w = f.dataset.w || f.style.getPropertyValue('--w') || '0%';
+        gsap.to(f,{width:w,duration:1.2,ease:'power3.out',scrollTrigger:{
+          trigger:card,start:'top 85%',toggleActions:'play none none reverse'
+        }});
+      });
+      card.addEventListener('click',function(){
+        card.classList.toggle('flipped');
+      });
+    });
+  }
+
+  function varEase(n){
+    // fallback for CSS var inside GSAP string ease
+    var map={'ease':'power3.out','bounce':'back.out(1.7)'};
+    return map[n]||'power3.out';
+  }
+
+  /* ---------- micro-interactions: magnetic buttons ---------- */
+  if(!touch && !reduce){
+    els('.btn,.tbtn').forEach(function(b){
+      b.addEventListener('mousemove',function(e){
+        var r=b.getBoundingClientRect();
+        var px=((e.clientX-r.left-r.width/2)/r.width)*10;
+        var py=((e.clientY-r.top-r.height/2)/r.height)*10;
+        b.style.transform='translate('+px+'px,'+py+'px)';
+      });
+      b.addEventListener('mouseleave',function(){b.style.transform='';});
+    });
+  }
+
+  /* ---------- day/night toggle ---------- */
+  var themeToggle = el('#themeToggle');
+  if(themeToggle){
+    var saved = localStorage.getItem('pg-theme');
+    if(saved==='day'){body.classList.add('day-mode');themeToggle.textContent='🌙';}
+    themeToggle.addEventListener('click',function(){
+      body.classList.toggle('day-mode');
+      var isDay = body.classList.contains('day-mode');
+      themeToggle.textContent = isDay ? '🌙' : '☀️';
+      try{localStorage.setItem('pg-theme',isDay?'day':'night');}catch(e){}
+    });
+  }
+
+  /* ---------- Easter eggs ---------- */
+  (function(){
+    var logoClicks=0;
+    var konami=[38,38,40,40,37,39,37,39,66,65];
+    var konamiIdx=0;
+    var mochiBuf='';
+    var eggShown=false;
+
+    function showEgg(name){
+      if(eggShown) return;
+      eggShown=true;
+      var el=document.createElement('div');
+      el.style.position='fixed';el.style.inset='0';el.style.zIndex='10000';
+      el.style.display='grid';el.style.placeItems='center';
+      el.style.background='rgba(0,0,0,.85)';
+      el.innerHTML='<div style="text-align:center;color:#fff;font-family:var(--display);font-size:clamp(20px,6vw,56px);animation:eggPop .5s var(--ease)">'+name+'</div>';
+      el.addEventListener('click',function(){el.remove();eggShown=false;});
+      doc.body.appendChild(el);
+    }
+
+    // logo click x5
+    els('.logo').forEach(function(l){
+      l.addEventListener('click',function(){
+        logoClicks++;
+        if(logoClicks>=5){showEgg('PAWGRAM UNLOCKED · DEV MODE');logoClicks=0;}
+      });
+    });
+
+    // Konami code
+    addEventListener('keydown',function(e){
+      if(e.which===konami[konamiIdx]){
+        konamiIdx++;
+        if(konamiIdx===konami.length){showEgg('KONAMI · ALL GAMES UNLOCKED');konamiIdx=0;}
+      } else {konamiIdx=0;}
+    });
+
+    // type "mochi"
+    addEventListener('keydown',function(e){
+      mochiBuf=(mochiBuf+e.key).toLowerCase().slice(-6);
+      if(mochiBuf==='mochi'){showEgg('MOCHI · +1 LUCK');mochiBuf='';}
+    });
+  })();
+
+  /* ---------- paw click trail ---------- */
+  if(!touch && !reduce){
+    addEventListener('mousedown',function(e){
+      var trail=document.createElement('div');
+      trail.className='cursor-trail';
+      trail.style.left=e.clientX+'px';trail.style.top=e.clientY+'px';
+      trail.style.background='var(--coral)';
+      trail.style.width='14px';trail.style.height='14px';
+      trail.style.opacity='.8';
+      doc.body.appendChild(trail);
+      gsap.to(trail,{scale:0,opacity:0,duration:.4,ease:'power2.out',onComplete:function(){trail.remove();}});
+    });
+  }
+
+  /* ---------- lightbox: arrow keys + share ---------- */
+  var lb = el('#lb');
+  if(lb && gsap){
+    var lbimg = lb.querySelector('img');
+    var items = Array.from(els('[data-lb]'));
+    var cur = 0;
+    function openImg(idx){
+      if(idx<0||idx>=items.length)return;
+      cur=idx;
+      var v=items[cur].dataset.lb||'';
+      if(v.indexOf('var(')===0){
+        var name=v.slice(4,-1).trim();
+        v=getComputedStyle(doc).getPropertyValue(name).trim().replace(/^url\(["']?/,'').replace(/["']?\)$/,'');
+      }
+      lbimg.src=v;
+      lb.classList.add('on');
+      body.style.overflow='hidden';
+    }
+    els('[data-lb]').forEach(function(el,i){
+      el.addEventListener('click',function(){openImg(i);});
+    });
+    addEventListener('keydown',function(e){
+      if(!lb.classList.contains('on'))return;
+      if(e.key==='ArrowLeft')openImg(cur-1);
+      else if(e.key==='ArrowRight')openImg(cur+1);
+      else if(e.key==='Escape'){lb.classList.remove('on');body.style.overflow='';}
+    });
+    // share button
+    var shareBtn = document.createElement('button');
+    shareBtn.className='lb-share';
+    shareBtn.innerHTML='↗';
+    shareBtn.style.position='absolute';shareBtn.style.bottom='30px';shareBtn.style.left='50%';
+    shareBtn.style.transform='translateX(-50%)';shareBtn.style.background='rgba(255,255,255,.15)';
+    shareBtn.style.border='1px solid rgba(255,255,255,.3)';shareBtn.style.color='#fff';
+    shareBtn.style.width='44px';shareBtn.style.height='44px';shareBtn.style.borderRadius='50%';
+    shareBtn.style.cursor='pointer';shareBtn.style.fontSize='20px';
+    shareBtn.addEventListener('click',function(){
+      if(navigator.share){navigator.share({url:location.href,text:'PAWGRAM · Frame from the thread'});}
+      else{prompt('Copy link',location.href);}
+    });
+    lb.appendChild(shareBtn);
+    lb.querySelector('.x').style.zIndex='10';
+    shareBtn.style.zIndex='10';
+  }
+
+})();

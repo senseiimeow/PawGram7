@@ -308,6 +308,20 @@
         }
       });
     }
+
+    /* ---------- cast cards: height bar fill + flip hint ---------- */
+    els('.pcard').forEach(function(card){
+      var fills = card.querySelectorAll('.fill');
+      fills.forEach(function(f){
+        var w = f.dataset.w || f.style.getPropertyValue('--w') || '0%';
+        gsap.to(f,{width:w,duration:1.2,ease:'power3.out',scrollTrigger:{
+          trigger:card,start:'top 85%',toggleActions:'play none none reverse'
+        }});
+      });
+      card.addEventListener('click',function(){
+        card.classList.toggle('flipped');
+      });
+    });
   }
 
   function varEase(n){

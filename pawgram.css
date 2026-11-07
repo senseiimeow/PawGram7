@@ -208,6 +208,8 @@ header.nav.solid{
 .lname span{opacity:0;transform:translateY(14px);animation:lchar .6s var(--ease) forwards;}
 @keyframes lchar{to{opacity:1;transform:none;}}
 
+@keyframes eggPop{from{transform:scale(.6) rotate(-8deg);opacity:0;}to{transform:scale(1) rotate(0);opacity:1;}}
+
 /* ---------- hero ---------- */
 .hero{min-height:100svh;display:grid;place-items:center;position:relative;overflow:hidden;
   background:radial-gradient(150% 100% at 40% 30%,#1a0f24 0%,#0a0710 55%,#050409 100%);}

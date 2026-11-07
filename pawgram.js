@@ -330,4 +330,74 @@
     return map[n]||'power3.out';
   }
 
+  /* ---------- micro-interactions: magnetic buttons ---------- */
+  if(!touch && !reduce){
+    els('.btn,.tbtn').forEach(function(b){
+      b.addEventListener('mousemove',function(e){
+        var r=b.getBoundingClientRect();
+        var px=((e.clientX-r.left-r.width/2)/r.width)*10;
+        var py=((e.clientY-r.top-r.height/2)/r.height)*10;
+        b.style.transform='translate('+px+'px,'+py+'px)';
+      });
+      b.addEventListener('mouseleave',function(){b.style.transform='';});
+    });
+  }
+
+  /* ---------- Easter eggs ---------- */
+  (function(){
+    var logoClicks=0;
+    var konami=[38,38,40,40,37,39,37,39,66,65];
+    var konamiIdx=0;
+    var mochiBuf='';
+    var eggShown=false;
+
+    function showEgg(name){
+      if(eggShown) return;
+      eggShown=true;
+      var el=document.createElement('div');
+      el.style.position='fixed';el.style.inset='0';el.style.zIndex='10000';
+      el.style.display='grid';el.style.placeItems='center';
+      el.style.background='rgba(0,0,0,.85)';
+      el.innerHTML='<div style="text-align:center;color:#fff;font-family:var(--display);font-size:clamp(20px,6vw,56px);animation:eggPop .5s var(--ease)">'+name+'</div>';
+      el.addEventListener('click',function(){el.remove();eggShown=false;});
+      doc.body.appendChild(el);
+    }
+
+    // logo click x5
+    els('.logo').forEach(function(l){
+      l.addEventListener('click',function(){
+        logoClicks++;
+        if(logoClicks>=5){showEgg('PAWGRAM UNLOCKED · DEV MODE');logoClicks=0;}
+      });
+    });
+
+    // Konami code
+    addEventListener('keydown',function(e){
+      if(e.which===konami[konamiIdx]){
+        konamiIdx++;
+        if(konamiIdx===konami.length){showEgg('KONAMI · ALL GAMES UNLOCKED');konamiIdx=0;}
+      } else {konamiIdx=0;}
+    });
+
+    // type "mochi"
+    addEventListener('keydown',function(e){
+      mochiBuf=(mochiBuf+e.key).toLowerCase().slice(-6);
+      if(mochiBuf==='mochi'){showEgg('MOCHI · +1 LUCK');mochiBuf='';}
+    });
+  })();
+
+  /* ---------- paw click trail ---------- */
+  if(!touch && !reduce){
+    addEventListener('mousedown',function(e){
+      var trail=document.createElement('div');
+      trail.className='cursor-trail';
+      trail.style.left=e.clientX+'px';trail.style.top=e.clientY+'px';
+      trail.style.background='var(--coral)';
+      trail.style.width='14px';trail.style.height='14px';
+      trail.style.opacity='.8';
+      doc.body.appendChild(trail);
+      gsap.to(trail,{scale:0,opacity:0,duration:.4,ease:'power2.out',onComplete:function(){trail.remove();}});
+    });
+  }
+
 })();

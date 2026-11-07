@@ -91,6 +91,23 @@ body.season-tint{background:radial-gradient(circle at 50% 30%,hsl(var(--season-h
 .chip .go{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--coral);font-weight:700;}
 .chip .thumb{width:56px;height:56px;border-radius:12px;background:var(--line2);margin-top:10px;}
 
+/* ---------- day/night toggle ---------- */
+body.day-mode{
+  --ink:#f4f1f8; --ink2:#e9e5ef; --card:#ffffff; --card2:#f7f5fa;
+  --line:rgba(0,0,0,.08); --line2:rgba(0,0,0,.12);
+  --cream:#0a0710; --mute:#6b637a; --mute2:#8a8299;
+  --coral:#d44f62; --amber:#e08a3e; --sakura:#c87da8;
+}
+body.day-mode .hero{background:radial-gradient(150% 100% at 40% 30%,#fff0f4 0%,#f4f1f8 55%,#e9e5ef 100%);}
+body.day-mode .phone{background:#ffffff;border-color:rgba(0,0,0,.08);box-shadow:0 20px 60px rgba(0,0,0,.08);}
+body.day-mode .bub.theirs{background:#f7f5fa;border-color:rgba(0,0,0,.08);color:#0a0710;}
+body.day-mode #drawer{background:rgba(244,241,248,.96);}
+body.day-mode .drawer-bg{background:rgba(244,241,248,.96);}
+#themeToggle{font-size:16px;border-radius:50%;width:40px;height:40px;display:grid;place-items:center;
+  border:1px solid var(--line);background:var(--card);color:var(--cream);cursor:pointer;}
+#themeToggle:hover{border-color:var(--coral);color:var(--coral);}
+body.day-mode #themeToggle{color:#0a0710;border-color:rgba(0,0,0,.2);}
+
 /* ---------- cast cards ---------- */
 .pcard{transition:transform .4s var(--ease),box-shadow .3s;cursor:pointer;}
 .pcard.flipped{transform:rotateY(180deg);}

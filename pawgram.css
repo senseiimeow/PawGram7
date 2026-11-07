@@ -163,3 +163,69 @@ header.nav.solid{
 
 .lname span{opacity:0;transform:translateY(14px);animation:lchar .6s var(--ease) forwards;}
 @keyframes lchar{to{opacity:1;transform:none;}}
+
+/* ---------- hero ---------- */
+.hero{min-height:100svh;display:grid;place-items:center;position:relative;overflow:hidden;
+  background:radial-gradient(150% 100% at 40% 30%,#1a0f24 0%,#0a0710 55%,#050409 100%);}
+.hero canvas#tokyo{position:absolute;inset:0;z-index:1;width:100%;height:100%;opacity:.45;}
+.hero .wrap{z-index:4;text-align:center;padding-top:20px;}
+.hero h1 span{display:inline-block;}
+.hero .badge{display:inline-block;padding:6px 16px;border:1px solid var(--coral);
+  border-radius:var(--radius-pill);font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--cream);background:rgba(255,107,129,.1);}
+.hero .jp{font-family:var(--jp);font-size:clamp(16px,3vw,22px);color:var(--amber);
+  letter-spacing:.25em;opacity:.9;}
+.hero .logline{max-width:min(720px,88vw);margin:22px auto 0;font-size:clamp(14px,1.5vw,18px);
+  line-height:1.7;color:var(--mute);opacity:0;}
+.hero-cta{display:flex;gap:12px;justify-content:center;margin-top:24px;}
+.hero-cta .btn{padding:12px 26px;border-radius:var(--radius-pill);font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;font-size:13px;transition:all .3s var(--ease);}
+.hero-cta .btn:hover{box-shadow:0 0 24px rgba(255,107,129,.5);transform:translateY(-2px);}
+.hero-stats{display:flex;justify-content:center;gap:24px;margin-top:30px;opacity:0;}
+.hero-stats div{text-align:center;}
+.hero-stats span{font-family:var(--display);font-size:clamp(20px,3vw,32px);color:var(--coral);
+  display:block;}
+.hero-stats b{font-size:11px;text-transform:uppercase;letter-spacing:.18em;color:var(--mute2);}
+.scrollcue{position:absolute;bottom:34px;left:50%;transform:translateX(-50%);z-index:4;
+  color:var(--mute2);font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+  animation:scrollBounce 2.5s ease-in-out infinite;}
+.scrollcue i{display:inline-block;width:10px;height:10px;border-right:2px solid var(--coral);
+  border-bottom:2px solid var(--coral);transform:rotate(45deg);margin-left:6px;}
+@keyframes scrollBounce{0%,100%{transform:translateX(-50%) translateY(0);}50%{transform:translateX(-50%) translateY(-8px);}}
+
+/* ---------- phone mock ---------- */
+.phonestage{position:relative;z-index:4;max-width:320px;margin:28px auto 0;opacity:0;}
+.phone{background:var(--card2);border:2px solid var(--line);border-radius:34px;
+  padding:18px 12px 22px;box-shadow:0 20px 60px rgba(0,0,0,.6);}
+.notch{width:110px;height:16px;border-radius:0 0 12px 12px;background:var(--ink2);margin:0 auto 12px;}
+.chatbar{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.avatar{width:30px;height:30px;border-radius:50%;background:var(--grad);display:flex;align-items:center;
+  justify-content:center;font-weight:800;font-size:13px;color:#000;}
+.who{flex:1;min-width:0;}
+.who .handle{font-size:11px;font-weight:700;color:#fff;}
+.who small{font-size:8px;color:var(--mute2);text-transform:uppercase;letter-spacing:.1em;}
+.chatlog{height:260px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:0 4px;
+  scrollbar-width:none;}
+.chatlog::-webkit-scrollbar{display:none;}
+.bub{max-width:78%;padding:8px 12px;border-radius:14px;font-size:13px;line-height:1.5;
+  animation:bubIn .35s var(--ease) both;}
+.bub.mine{align-self:flex-end;background:var(--coral);color:#000;border-bottom-right-radius:2px;}
+.bub.theirs{align-self:flex-start;background:var(--card);border:1px solid var(--line);
+  color:var(--cream);border-bottom-left-radius:2px;}
+@keyframes bubIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+.chatinput{display:flex;align-items:center;gap:8px;margin-top:10px;padding-top:8px;
+  border-top:1px solid var(--line);}
+.chatinput span{font-size:11px;color:var(--mute2);flex:1;}
+.chatinput b{font-size:16px;color:var(--coral);}
+
+/* ---------- marquee ---------- */
+.marquee{overflow:hidden;background:rgba(255,255,255,.03);border-top:1px solid var(--line);
+  border-bottom:1px solid var(--line);padding:10px 0;}
+.mtrack{display:inline-block;animation:marq 20s linear infinite;white-space:nowrap;
+  font-family:var(--display);font-size:clamp(14px,2vw,20px);color:var(--cream);letter-spacing:.05em;}
+.mtrack span{margin:0 18px;display:inline-block;}
+@keyframes marq{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+/* ---------- chat bubbles (cast section reuse) ---------- */
+.bubbles{display:flex;flex-direction:column;gap:8px;}
+.bubbles .bub{margin:0;}

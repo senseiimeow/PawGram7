@@ -201,6 +201,66 @@
         trigger:c,start:'top 80%',toggleActions:'play none none none'
       }});
     });
+
+    /* ---------- hero entrance ---------- */
+    var hero = el('.hero');
+    if(hero && gsap){
+      var tl = gsap.timeline({defaults:{ease:'power3.out'}});
+
+      // per-letter bounce on title spans
+      els('h1 span').forEach(function(s,i){
+        tl.from(s,{y:40,opacity:0,scale:1.4,duration:.7,ease:'back.out(1.7)'},i*0.08);
+      },0);
+
+      tl.from('.kicker',{y:20,opacity:0,duration:.6},'-=0.5')
+        .from('.badge',{y:20,opacity:0,duration:.6},'-=0.4')
+        .from('.jp',{y:15,opacity:0,duration:.6},'-=0.4')
+        .from('.logline',{y:25,opacity:0,duration:.7},'-=0.3')
+        .from('.hero-cta .btn',{y:20,opacity:0,duration:.6,stagger:.15},'-=0.4')
+        .from('.hero-stats',{y:20,opacity:0,duration:.7},'-=0.5')
+        .from('.phonestage',{y:30,opacity:0,duration:.8,ease:'back.out(1.4)'},'-=0.6')
+        .from('.scrollcue',{y:20,opacity:0,duration:.6},'-=0.4');
+
+      // neon flicker on badge
+      gsap.to('.badge',{
+        duration:0.15,repeat:-1,yoyo:true,ease:'power1.inOut',
+        opacity:function(){return 0.85+Math.random()*0.15;},
+        textShadow:function(){return '0 0 '+(10+Math.random()*10)+'px var(--coral)';}
+      });
+    }
+
+    /* ---------- chat typing in phone ---------- */
+    var chatlog = el('#chatlog');
+    if(chatlog && gsap){
+      var lines = [
+        'u up?',
+        'saw this sakura and thought of you',
+        'it was 2:47 AM',
+        'you replied in 3 seconds',
+        'i saved that message',
+        'now we\u2019re here'
+      ];
+      var li = 0;
+      function typeLine(){
+        if(li>=lines.length) return;
+        var text = lines[li++];
+        var div = document.createElement('div');
+        div.className='bub mine';
+        div.textContent='';
+        chatlog.appendChild(div);
+        var k=0;
+        (function step(){
+          div.textContent = text.slice(0,k+1);
+          k++;
+          if(k<text.length){setTimeout(step,60+Math.random()*40);}
+          else{
+            chatlog.scrollTop = chatlog.scrollHeight;
+            setTimeout(typeLine,700+Math.random()*800);
+          }
+        })();
+      }
+      setTimeout(typeLine,1200);
+    }
   }
 
   function varEase(n){

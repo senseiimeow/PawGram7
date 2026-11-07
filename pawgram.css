@@ -58,6 +58,7 @@ body.reduced-motion{
 body.reduced-motion .rv{opacity:1;transform:none;filter:none;}
 
 /* ---------- thread path (SVG) ---------- */
+:root{--season-hue:280deg;}
 .thread-svg{
   position:fixed; inset:0; z-index:1; pointer-events:none;
   overflow:visible;
@@ -70,6 +71,25 @@ body.reduced-motion .rv{opacity:1;transform:none;filter:none;}
   stroke-linejoin:round;
   filter:drop-shadow(0 0 10px rgba(255,107,129,.6));
 }
+
+/* ---------- chapters rail drag ---------- */
+.rail{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;
+  padding:4px 0 24px;scrollbar-width:none;}
+.rail::-webkit-scrollbar{display:none;}
+.rail.dragging{cursor:grabbing;}
+.rail.dragging .chip{cursor:grabbing;}
+.chip{scroll-snap-align:start;min-width:min(300px,92vw);position:relative;}
+
+/* ---------- season hue body tint ---------- */
+body.season-tint{background:radial-gradient(circle at 50% 30%,hsl(var(--season-hue),40%,12%) 0%,var(--ink) 60%);}
+
+/* ---------- chapter chip enhancements ---------- */
+.chip .wash{position:absolute;inset:0;border-radius:24px;opacity:.5;filter:blur(20px);z-index:-1;}
+.chip h4{font-family:var(--sans);font-size:clamp(16px,2.5vw,20px);margin:10px 0 6px;}
+.chip .when{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--mute2);margin-bottom:8px;}
+.chip p{font-size:14px;line-height:1.6;color:var(--mute);margin-bottom:14px;}
+.chip .go{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--coral);font-weight:700;}
+.chip .thumb{width:56px;height:56px;border-radius:12px;background:var(--line2);margin-top:10px;}
 
 /* ---------- custom cursor ---------- */
 #paw-cursor{

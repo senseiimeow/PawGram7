@@ -261,6 +261,53 @@
       }
       setTimeout(typeLine,1200);
     }
+
+    /* ---------- chapters rail: horizontal drag + scroll ---------- */
+    var rail = el('.rail');
+    if(rail){
+      var isDown=false,startX,scrollLeft;
+      rail.addEventListener('mousedown',function(e){isDown=true;startX=e.pageX-rail.offsetLeft;scrollLeft=rail.scrollLeft;rail.classList.add('dragging');},{passive:true});
+      rail.addEventListener('mouseleave',function(){isDown=false;rail.classList.remove('dragging');});
+      rail.addEventListener('mouseup',function(){isDown=false;rail.classList.remove('dragging');});
+      rail.addEventListener('mousemove',function(e){if(!isDown)return;e.preventDefault();var x=e.pageX-rail.offsetLeft;var walk=(x-startX)*1.6;rail.scrollLeft=scrollLeft-walk;},{passive:true});
+      rail.addEventListener('touchstart',function(e){isDown=true;startX=e.touches[0].pageX-rail.offsetLeft;scrollLeft=rail.scrollLeft;},{passive:true});
+      rail.addEventListener('touchend',function(){isDown=false;});
+      rail.addEventListener('touchmove',function(e){if(!isDown)return;var x=e.touches[0].pageX-rail.offsetLeft;var walk=(x-startX)*1.6;rail.scrollLeft=scrollLeft-walk;},{passive:true});
+    }
+
+    /* ---------- season scroll: pin chapters & shift bg ---------- */
+    var chaptersSec = el('#chapters');
+    if(chaptersSec && ScrollTrigger){
+      gsap.to('body',{
+        backgroundColor:'#140d1c',
+        scrollTrigger:{
+          trigger:chaptersSec,start:'top top',end:'+=600',scrub:true,pin:false
+        }
+      });
+      ScrollTrigger.create({
+        trigger:chaptersSec,start:'top top',end:'+=600',scrub:true,
+        onUpdate:function(self){
+          var p = self.progress;
+          var hues = [280,300,320,340,0,20,40];
+          var h = Math.round(hues[Math.floor(p*hues.length)] + (p*hues.length%1)*(hues[Math.min(Math.floor(p*hues.length)+1,hues.length-1)]-hues[Math.floor(p*hues.length)]));
+          doc.style.setProperty('--season-hue',h+'deg');
+        }
+      });
+    }
+
+    /* ---------- thread path: animate draw on scroll ---------- */
+    var threadPath = el('.thread-svg path');
+    if(threadPath && ScrollTrigger){
+      var total = threadPath.getTotalLength();
+      threadPath.style.strokeDasharray = total;
+      threadPath.style.strokeDashoffset = total;
+      ScrollTrigger.create({
+        trigger:'body',start:'top top',end:'bottom bottom',scrub:true,
+        onUpdate:function(self){
+          threadPath.style.strokeDashoffset = total*(1-self.progress);
+        }
+      });
+    }
   }
 
   function varEase(n){
